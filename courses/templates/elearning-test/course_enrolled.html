@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}
+  {{ course.title }} - Modules
+{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto p-5">
+    <div class="flex flex-col lg:w-80 md:flex-row">
+        <!-- Sidebar with course video and title -->
+        <div class="md:w-1/3 lg:w-1/4 p-4">
+            <h2 class="text-2xl font-semibold text-center mt-4">{{ course.title }} - Modules</h2>
+            <video id="lessonVideo" width="200" class="w-full h-64 rounded-lg mt-5" controls>
+                <source id="videoSource" src="" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <!-- Module List -->
+        <div class="md:w-2/3 lg:w-3/4 p-4">
+            <ul class="space-y-4">
+                {% for module in modules %}
+                    <li class="bg-white p-4 rounded-lg shadow-md dark:bg-gray-800">
+                        <div class="flex justify-between items-center mb-2">
+                            <button class="text-blue-700 hover:underline" onclick="toggleLessons('lessons-{{ module.id }}')">
+                                <h3 class="text-xl font-bold  text-gray-900 dark:text-white">{{ module.title }}</h3>
+                            </button>
+                        </div>
+                        <ul id="lessons-{{ module.id }}" class="hidden p-3 space-y-3 text-sm text-gray-700 dark:text-gray-200">
+                            {% for lesson in module.lessons.all %}
+                            
+                            {% if lesson.video.first.video and lesson.description %}
+                            <li>
+                                <div class="flex items-center">
+                                    <input id="checkbox-course-{{ lesson.id }}" type="checkbox" value="{{ lesson.id }}" 
+                                           class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" 
+                                           onchange="playVideo('{{ lesson.video.first.video.url }}', this)">
+                                    <label for="checkbox-course-{{ lesson.id }}" class="ms-2 text-lg font-medium text-gray-900 dark:text-gray-300" >{{ lesson.title }}</label>
+                                </div>
+                                <hr>
+                                <div class="my-2">
+
+                                    {{ lesson.description }}
+                                </div>
+
+                            </li>
+                            {% elif lesson.description %}
+                            {{ lesson.description }}
+                            {% else %}
+
+                            {% endif %}
+                                
+                               
+                            {% empty %}
+                                <li>No lessons available for this module.</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% empty %}
+                    <li>No modules available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+// Function to toggle lesson visibility
+function toggleLessons(lessonId) {
+    const lessonList = document.getElementById(lessonId);
+    lessonList.classList.toggle('hidden');
+}
+
+// Function to play video when a lesson checkbox is clicked
+function playVideo(videoUrl, checkbox) {
+    const videoElement = document.getElementById('lessonVideo');
+    const videoSource = document.getElementById('videoSource');
+
+    // If the checkbox is checked, set the video source and play it
+    if (checkbox.checked) {
+        videoSource.src = videoUrl;
+        videoElement.load();
+        videoElement.play();
+    } else {
+        // Optionally pause or stop the video if unchecked
+        videoElement.pause();
+        videoSource.src = ""; // Reset the video source
+        videoElement.load();
+    }
+}
+</script>
+
+{% endblock content %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Module {{ module.order|add:1 }}: {{ module.title }}
+{% endblock %}
+
+{% block content %}
+{% with course=module.course %}
+  <h1>Course "{{ course.title }}"</h1>
+  <div class="lessons">
+    <h3>Modules</h3>
+    <ul id="modules">
+      {% for m in course.modules.all %}
+        <li data-id="{{ m.id }}" {% if m == module %}class="selected"{% endif %}>
+          <a href="{% url 'module_lesson_list' m.public_id %}">
+            <span>
+              Module <span class="order">{{ m.order|add:1 }}</span>
+            </span>
+            <br>
+            {{ m.title }}
+          </a>
+        </li>
+      {% empty %}
+        <li>No modules yet.</li>
+      {% endfor %}
+    </ul>
+    <p><a href="{% url 'course_module_update' course.public_id %}">
+    Edit modules</a></p>
+  </div>
+  <div class="module">
+    <h2>Module {{ module.order|add:1 }}: {{ module.title }}</h2>
+    <h3>Module lessons:</h3>
+    <div id="module-lessons">
+      {% for lesson in module.lessons.all %}
+        <div data-id="{{ lesson.public_id }}">
+         
+            <p>{{ lesson.title }} 
+          
+            <form action="{% url 'module_lesson_delete' lesson.public_id %}" method="post">
+              <input type="submit" value="Delete">
+             
+              {% csrf_token %}
+            </form>
+         
+        </div>
+      {% empty %}
+        <p>This module has no lessons yet.</p>
+      {% endfor %}
+    </div>
+    <h3>Add new lesson:</h3>
+    </li>
+        <a href="{% url 'module_lesson_create' module.public_id %}">Add</a>
+      </li>
+  </div>
+{% endwith %}
+{% endblock %}
+

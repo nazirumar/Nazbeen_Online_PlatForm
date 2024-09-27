@@ -1,0 +1,63 @@
+
+
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+Home Page
+{% endblock title %}
+
+{% block content %}
+<!-- Dashboard Container -->
+<div class="flex h-screen bg-white">
+    <!-- Sidebar -->
+    <div class="w-64 bg-gray-100 text-gray-900 h-full p-4">
+      <div class="flex justify-center mb-4">
+        <img src="logo.png" alt="Logo" class="w-12 h-12 rounded-full">
+      </div>
+      <h2 class="text-lg font-bold  text-center mb-4">Teacher Dashboard</h2>
+      <ul class="mt-4 ">
+        <li class="py-2">
+          <a href="{% url 'instructor_dashboard'  request.user.public_id %}" class="flex items-center shadow hover:bg-blue-800 p-2 rounded">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Dashboard
+          </a>
+        </li>
+        <li class="py-2">
+          <a href="{% url 'instructor_course_list' request.user.public_id %}" class="flex items-center shadow hover:bg-blue-800 p-2 rounded">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            My Courses
+          </a>
+        </li>
+        <li class="py-2">
+          <a href="#" class="flex items-center shadow hover:bg-blue-800 p-2 rounded">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6 4h.01M9 16h.01"></path></svg>
+            My Modules
+          </a>
+        </li>
+        <li class="py-2">
+          <a href="#" class="flex items-center shadow hover:bg-blue-800 p-2 rounded">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            My Lessons
+          </a>
+   </li>
+        <li class="py-2">
+          <a href="#" class="flex items-center shadow hover:bg-blue-800 p-2 rounded">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-4v4m0-4V4m4 4H4m4 4l4-4m-2-2l-4 4"></path></svg>
+            Analytics
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- Main Content -->
+    <div class="flex-1 p-4">
+      <!-- Dashboard Content -->
+      <div class="bg-white shadow-md rounded p-4">
+        {% block content_dashboard %}
+          
+        {% endblock content_dashboard %}
+        <!-- ... -->
+      </div>
+    </div>
+  </div>
+
+  {% endblock %}

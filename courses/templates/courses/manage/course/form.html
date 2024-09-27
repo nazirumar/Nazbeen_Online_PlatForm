@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+<!-- course_form.html -->
+{% load custom_tags %}
+{% block title %}
+{% if object %}
+Edit course "{{ object.title }}"
+{% else %}
+Create a new course
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="block max-w-lg mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+    
+        <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="subject">
+                {{ form.subject.label }}
+            </label>
+            {{ form.subject|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+            <p class="text-red-500 text-xs italic">{{ form.subject.errors }}</p>
+        </div>
+    
+        <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="students">
+                {{ form.students.label }}
+            </label>
+            {{ form.students|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+            <p class="text-red-500 text-xs italic">{{ form.students.errors }}</p>
+        </div>
+    
+        <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
+                {{ form.description.label }}
+            </label>
+            {{ form.description|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+            <p class="text-red-500 text-xs italic">{{ form.description.errors }}</p>
+        </div>
+    
+        <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="pdf">
+                {{ form.pdf.label }}
+            </label>
+            {{ form.pdf|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+            <p class="text-red-500 text-xs italic">{{ form.pdf.errors }}</p>
+        </div>
+    
+        <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="image">
+                {{ form.image.label }}
+            </label>
+            {{ form.image|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+            <p class="text-red-500 text-xs italic">{{ form.image.errors }}</p>
+        </div>
+    
+        <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="access">
+                {{ form.access.label }}
+            </label>
+            {{ form.access|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+            <p class="text-red-500 text-xs italic">{{ form.access.errors }}</p>
+        </div>
+    
+        <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
+                {{ form.status.label }}
+            </label>
+            {{ form.status|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+            <p class="text-red-500 text-xs italic">{{ form.status.errors }}</p>
+        </div>
+    
+        <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="is_free">
+                {{ form.is_free.label }}
+            </label>
+            {{ form.is_free|add_class:"mr-2 leading-tight" }}
+            <p class="text-red-500 text-xs italic">{{ form.is_free.errors }}</p>
+        </div>
+    
+        <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="price">
+                {{ form.price.label }}
+            </label>
+            {{ form.price|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+            <p class="text-red-500 text-xs italic">{{ form.price.errors }}</p>
+        </div>
+    
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Save Course
+        </button>
+    </form>
+    
+    </div>
+    
+{% endblock %}

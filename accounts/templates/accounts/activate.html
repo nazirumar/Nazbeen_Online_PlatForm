@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  About
+{% endblock title %}
+
+{% block content %}
+{% autoescape off %}
+
+<p>Hi {{ user.username }},</p>
+<p>Please click the link below to activate your account:</p>
+<a href="http://{{ domain }}/account/activate/{{ uid }}/{{ token }}/">Activate your account</a>
+
+{% endautoescape %}
+{% endblock content %}

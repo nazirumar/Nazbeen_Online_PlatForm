@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Home Page
+{% endblock title %}
+
+{% block content %}
+{% include "banner/banner.html" %}
+
+<div class="flex-grow p-6 mt-4 mb-5">
+<div class="flex mx-auto">
+  <!-- Main lesson video section -->
+  <div class="flex-1">
+    <!-- Main lesson title -->
+    <h2 class="text-2xl font-bold mb-2" id="lesson-title">{{ lesson.title }}</h2>
+    
+    <!-- Video Player -->
+    <video id="main-video-player" width="1500" controls>
+      <source id="main-video-source" src="{{ lesson.video.url }}" type="video/mp4">
+      Your browser does not support the video tag.
+      <p id="duration">Video length: </p>
+
+    </video>
+    
+    <!-- Video Description -->
+    <p class="text-gray-600 mb-4" id="lesson-description">{{ lesson.description }}</p>
+  </div>
+
+  <!-- Related videos sidebar (like YouTube playlist) -->
+ 
+  <div class="w-1/4 ml-6">
+    <h3 class="text-lg font-semibold mb-3">Up Next</h3>
+    <ul class="my-5">
+      <span role="button" id="dropdownHelperButton" data-dropdown-toggle="dropdownHelper" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Dropdown checkbox <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+        </svg>
+        </span>
+        <div id="dropdownHelper" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-60 dark:bg-gray-700 dark:divide-gray-600">
+          <ul class="p-3 space-y-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHelperButton">
+              {% for video in videos %}
+              <li class="mb-4">
+                  <div class="flex space-x-4 border border-gray-300 p-2 rounded-lg shadow-sm hover:bg-gray-100 dark:hover:bg-gray-600">
+                      <!-- Checkbox for selection -->
+                      <div class="flex items-center h-5">
+                          <input id="helper-checkbox-{{ video.id }}" aria-describedby="helper-checkbox-text-{{ video.id }}" type="checkbox" value="{{ video.id }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                      </div>
+      
+                      <!-- Video details -->
+                      <div class="flex flex-col justify-center">
+                          <h4 class="text-sm font-medium">
+                              <a href="javascript:void(0)" class="text-blue-600 hover:underline" onclick="loadVideo('{{ video.id }}', '{{ video.video.url }}', '{{ video.title }}', '{{ video.description }}')">
+                                  {{ video.title }}
+                              </a>
+                          </h4>
+                          <p class="text-xs text-gray-500">{{ video.duration }} mins</p>
+                      </div>
+                  </div>
+              </li>
+              {% empty %}
+              <li>No videos available for this lesson.</li>
+              {% endfor %}
+          </ul>
+      </div>
+      
+    </ul>
+  </div>
+</div>
+
+</div>
+
+
+<script>
+
+  function loadVideo(videoId, videoUrl, title, description) {
+    // Update the video player source
+    const videoPlayer = document.getElementById('main-video-player');
+    const videoSource = document.getElementById('main-video-source');
+    const checkbox = document.getElementById(`helper-checkbox-${videoId}`);
+    videoPlayer.addEventListener('ended', function() {
+      
+        // Toggle the checkbox
+    checkbox.checked = !checkbox.checked;
+      // You can also perform other actions here
+  });
+videoPlayer.addEventListener('loadedmetadata', function() {
+      const duration = videoPlayer.duration;  // Duration in seconds
+      durationDisplay.innerText = `Video length: ${Math.floor(duration / 60)} minutes and ${Math.floor(duration % 60)} seconds`;
+  });
+
+    videoSource.src = videoUrl;
+    videoPlayer.load(); // Reload the video player with the new source
+    console.log(checkbox);
+    
+    // Update the lesson title and description
+    document.getElementById('lesson-title').innerText = title;
+    document.getElementById('lesson-description').innerText = description;
+  }
+</script>
+{% endblock content %}

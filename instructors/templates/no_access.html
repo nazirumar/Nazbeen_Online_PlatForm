@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+Home Page
+{% endblock title %}
+
+{% block content %}
+<div class=" max-w-full bg-red-100 h-auto p-4 h-90">
+
+        <h1>Access Denied</h1>
+        <p>Sorry, you do not have permission to access this page. This section is restricted to instructors only.</p>
+        <a href="{% url 'home' %}">Return to Homepage</a>
+</div>
+   
+        {% endblock %}

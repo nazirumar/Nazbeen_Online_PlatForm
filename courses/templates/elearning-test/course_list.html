@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Home Page
+{% endblock title %}
+
+{% block content %}
+
+
+<h1>Courses under {{ subject.name }}</h1>
+<ul>
+    {% for course in courses %}
+        <li><a href="{% url 'course_detail' course.id %}">{{ course.title }}</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock content %}

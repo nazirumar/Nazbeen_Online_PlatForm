@@ -1,0 +1,21 @@
+<section class="w-full mx-auto">
+    <div class="text-center p-6 bg-white border border-gray-200 shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+        <h5 class="mb-2 text-3xl font-bold text-gray-900 dark:text-white">Start your Django Web Development journey with Nazbeen AI</h5>
+        <p class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-400">Experience the future of web services.</p>
+    </div>
+    <div class="flex items-center justify-center bg-gray-300">
+        <a href="{% url 'home' %}" class="px-2">All</a>
+        {% for category in categories %}
+        <div class="items-center justify-center py-3">
+           <span class="px-2">
+            <a href="{% url 'categories' category.public_id %}">
+                {{category.title}}
+            </a>
+           
+           </span> 
+
+        </div>
+        {% endfor %}
+    </div>
+    
+</section>

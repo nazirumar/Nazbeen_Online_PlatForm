@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Home Page
+{% endblock title %}
+
+{% block content %}
+
+<h1>{{ module.title }}</h1>
+<p>{{ module.description }}</p>
+
+<h2>Topics</h2>
+{{lesson}}
+<ul>
+    {% for topic in topics %}
+    <br>
+        <li class="">{{ topic.title }}</li>
+<br>
+       {{ topic.content|safe }}
+       <br>
+       {% for videos in topic.module.course.lessons_video.all %}
+<br>
+       {{videos.title}} pp
+         
+    <br>
+       <video id="main-video-player" width="1500" controls>
+        <source id="main-video-source" src="{{ videos.video.url }}" >
+        Your browser does not support the video tag.
+        <p id="duration">Video length: </p>
+  
+      </video>
+      <br>
+      {% endfor %}
+      <br>
+
+    {% endfor %}
+    <br>
+</ul>
+
+
+<script>
+
+    function loadVideo(videoId, videoUrl, title, description) {
+      // Update the video player source
+      const videoPlayer = document.getElementById('main-video-player');
+      const videoSource = document.getElementById('main-video-source');
+      const checkbox = document.getElementById(`helper-checkbox-${videoId}`);
+      videoPlayer.addEventListener('ended', function() {
+        
+          // Toggle the checkbox
+      checkbox.checked = !checkbox.checked;
+        // You can also perform other actions here
+    });
+  videoPlayer.addEventListener('loadedmetadata', function() {
+        const duration = videoPlayer.duration;  // Duration in seconds
+        durationDisplay.innerText = `Video length: ${Math.floor(duration / 60)} minutes and ${Math.floor(duration % 60)} seconds`;
+    });
+  
+      videoSource.src = videoUrl;
+      videoPlayer.load(); // Reload the video player with the new source
+      console.log(checkbox);
+      
+      // Update the lesson title and description
+      document.getElementById('lesson-title').innerText = title;
+      document.getElementById('lesson-description').innerText = description;
+    }
+  </script>
+{% endblock content %}

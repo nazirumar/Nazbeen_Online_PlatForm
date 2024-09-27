@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ module.title }} Details</title>
+</head>
+<body>
+    <h1>Module: {{ module.title }}</h1>
+    <p>Description: {{ module.description }}</p>
+
+    <h2>Courses Related to This Module:</h2>
+    <ul>
+        {% for course in courses %}
+            <li>
+                <strong>Course:</strong> {{ course.title }}<br>
+                <strong>Subject:</strong> {{ course.subject.title }}<br>
+                <strong>Author:</strong> {{ course.author.username }}<br>
+                <strong>Price:</strong> {{ course.price }}
+            </li>
+        {% empty %}
+            <li>No courses related to this module.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
