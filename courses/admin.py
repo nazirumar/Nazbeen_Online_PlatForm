@@ -2,7 +2,7 @@ from django.contrib import admin
 
 import helpers
 from .models import (Course, Likes, Category, Subject,
-                      Module, Lesson, LessonVideo, Student, Enrollment, Quiz, Question, Payment)
+                      Module, Lesson, LessonVideo, Notification, Student, Enrollment, Quiz, Question)
 from django.utils.html import format_html
 # Customizing the Course Admin
 
@@ -78,7 +78,7 @@ class LessonInline(admin.TabularInline):
 
 
 class LikesAdmin(admin.ModelAdmin):
-    list_display = ('course', 'user', 'created_at')
+    list_display = ('course', 'user')
     list_filter = ('course', 'user')
     list_display_links = ('course', 'user')
 
@@ -150,7 +150,7 @@ class StudentAdmin(admin.ModelAdmin):
     inlines = [EnrollmentInline]
 
     def get_enrolled_courses(self, obj):
-        return ", ".join([enrollment.course.title for enrollment in obj.enrollment_set.all()])
+        return ", ".join([enrollment.title for enrollment in obj.enrolled_courses.all()])
     get_enrolled_courses.short_description = 'Enrolled Courses'
 
 
@@ -161,9 +161,9 @@ class QuestionInline(admin.TabularInline):
 
 
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'course', 'total_marks')
-    list_filter = ('course',)
-    search_fields = ('title', 'course__title')
+    list_display = ('title', 'module', 'created_at')
+    list_filter = ('title',)
+    search_fields = ('title', 'module__title')
     inlines = [QuestionInline]
 
 
@@ -173,7 +173,8 @@ admin.site.register(Module, ModuleAdmin)
 admin.site.register(Lesson, LessonAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Quiz, QuizAdmin)
-admin.site.register(Payment)
+admin.site.register(Notification)
+admin.site.register(Enrollment)
 admin.site.register(Likes, LikesAdmin)
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(Category, CategoryAdmin)

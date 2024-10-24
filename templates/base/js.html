@@ -9,9 +9,12 @@
 
 <script defer>
 
+
     function renderVideoElement(videoPlayerElement) {
         const currentVideoId = videoPlayerElement.getAttribute('id')
+        
         const videoPlayerId = `${currentVideoId}` + '-cfe-' + Math.random().toString(36).substr(2, 9);
+        console.log(videoPlayerId);
         videoPlayerElement.setAttribute("id", videoPlayerId);
         const cloudName = videoPlayerElement.dataset.cloudName;
         const videoUrl = videoPlayerElement.dataset.videoUrl;
@@ -26,9 +29,7 @@
     function renderAllVideos() {
         const videoPlayerClassName = 'cfe-video';
         const videoPlayerElements = document.getElementsByClassName(videoPlayerClassName);
-        console.log(videoPlayerElements);
         for (let el of videoPlayerElements) {
-            console.log(' hellp',el);
             renderVideoElement(el);
         }
     }

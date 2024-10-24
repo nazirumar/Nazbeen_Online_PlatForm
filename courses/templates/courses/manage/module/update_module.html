@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+
+{% block title %}Update Course{% endblock %}
+{% block content %}
+<div class="block max-w-lg mx-auto p-3 mt-4 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+
+<form method="post">
+    {% csrf_token %}
+    <div>
+        <label class="block text-gray-700 text-sm font-bold mb-2">{{ form.title.label }}</label>
+        {{ form.title|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+        <p class="text-red-500 text-xs italic">{{ form.title.errors }}</p>
+    </div>
+    <div>
+        <label class="block text-gray-700 text-sm font-bold mb-2">{{ form.description.label }}</label>
+        {{ form.description|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+        <p class="text-red-500 text-xs italic">{{ form.description.errors }}</p>
+    </div>
+    
+    <h3>Modules</h3>
+    {{ modules.management_form }}
+    
+    <div id="module_formset">
+        {% for form in modules %}
+            <div class="module-form mb-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">{{ form.title.label }}</label>
+                    {{ form.title|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+                    <p class="text-red-500 text-xs italic">{{ form.title.errors }}</p>
+                </div>
+
+                <div>
+                    <!-- This will create a hidden input and checkbox for delete -->
+                    <label for="{{ form.DELETE.id_for_label }}">
+                        <input type="checkbox" name="{{ form.prefix }}-DELETE" id="{{ form.DELETE.id_for_label }}" class="form-checkbox" />
+                        Delete
+                    </label>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Save
+    </button>
+</form>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <h3>Modules</h3>
+    {{ module_formset.management_form }}
+    {% for form in module_formset %}
+        <div class="module-form">
+            {{ form.as_p }}
+        </div>
+    {% endfor %}
+    
+    <button type="submit">Submit</button>
+</form>
+
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "instructor/base.html" %}
+{% load custom_tags %}
+
+{% block content_dashboard %}
+
+<div class="container mx-auto mt-8">
+  <div class="max-w-xl mx-auto p-6 text-white rounded shadow-lg">
+    <h2 class="text-2xl font-semibold text-center mb-8">Update Lesson Video</h2>
+    
+    <form class="space-y-4" action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="text-white">
+            {{ form.lesson.label_tag|add_class:"block mb-2 text-sm font-medium text-gray-900 dark:text-white" }}
+            {{ form.lesson|add_class:"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" }}
+            {{ form.lesson.errors }}
+        </div>
+        <div>
+            {{ form.title.label_tag|add_class:"block mb-2 text-sm font-medium text-gray-900 dark:text-white" }}
+            {{ form.title|add_class:"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" }}
+            {{ form.title.errors }}</div>
+        <div>
+            {{ form.video.label_tag }}
+            {{ form.video|add_class:"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" }}
+            {{ form.video.errors }}
+          </div>
+    
+       
+        
+        <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
+        
+    </form>
+  </div>
+</div>
+
+{% endblock %}

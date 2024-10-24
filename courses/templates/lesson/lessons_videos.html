@@ -76,6 +76,31 @@
     </div>
 
     <script>
+
+    
+$(document).ready(function() {
+    let video = document.getElementById('demo-player');
+    let lessonId = $('#demo-player').data('lesson-id');
+    console.log(video);
+    
+    // When the video ends, send an AJAX request to mark the lesson as watched
+    video.onended = function() {
+        $.ajax({
+            url: '/lessons/mark-watched/' + lessonId + '/',
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+            success: function(response) {
+                alert('Lesson marked as watched. Progress: ' + response.progress + '%');
+                // Optionally update a progress bar or notify the user about course completion
+            },
+            error: function(xhr, status, error) {
+                alert('Error marking the lesson as watched.');
+            }
+        });
+    };
+});
         function toggleLessons(moduleId) {
             const lessonList = document.getElementById(moduleId);
             if (lessonList) {
@@ -108,5 +133,7 @@
                 videoElement.play();
             }
         }
+      
+
     </script>
 {% endblock content %}

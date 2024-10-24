@@ -1,0 +1,82 @@
+{% extends "instructor/base.html" %}
+
+{% load custom_tags %}
+
+{% block content_dashboard %}
+
+<div class="relative overflow-x-auto mt-4 whitespace-nowrap">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th scope="col" class="px-4 py-2">
+                No:
+                </th>
+                <th scope="col" class="px-4 py-2">
+                    Students
+                </th>
+                <th scope="col" class="px-4 py-2">
+                    Courses Enrollment
+                </th>
+            
+                <th scope="col" class="px-4 py-2">
+                    Delete
+                </th>
+              
+            </tr>
+        </thead>
+        <tbody >
+                {% for student in object_list %}
+
+            <tr class="bg-white dark:bg-gray-800">
+                <th scope="row" class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    {{ forloop.counter }}
+
+                </th>
+                <th scope="row" class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    {{ student.user.username }}
+
+                </th>
+                <th scope="row" class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    {% for enrolled_course  in  student.enrolled_courses.all %}
+                    <ul class="space-y-4 list-disc list-inside dark:text-white">
+
+                    <ol class="ps-5 mt-2 space-y-1 list-decimal list-inside">
+                        {{ enrolled_course.title }}
+                        
+                    </ol>  <!-- This should be a link to the course details page --> 
+                       <!-- This line should be replaced with a link to the course details page -->
+                   </ul> 
+                    {% endfor %}
+                   
+                </th>
+                
+
+
+              
+          
+                <td class="px-4 py-2">
+                    <a href="{% url 'instructor_student_delete' student.public_id %}">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
+                          </svg>
+                          
+                    </a>
+
+                </td>
+
+            
+              
+            </tr>
+            {% empty %}
+                <p>You haven't created any students yet.</p>
+                {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+
+</div>
+
+{% endblock content_dashboard %}
+

@@ -1,5 +1,14 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import ProfileUser, Certificate
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.views import generic
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from instructors.models import Certificate
+from io import BytesIO
+from django.core.files import File
+from instructors.models import Certificate
+from profiles.models import ProfileUser
 from .forms import ProfileForms
 from django.contrib.auth.decorators import login_required
 
@@ -28,6 +37,16 @@ def profile_view(request, username):
 
     return render(request, 'profile/profile.html', context)
 @login_required
-def certificate_view(request, user_certificate):
-    certificate = get_object_or_404(Certificate, student__user__username=user_certificate)
+def certificate_view(request, public_id):
+    certificate = get_object_or_404(Certificate, student__user__public_id=public_id)
     return render(request, 'profile/certificate.html', {'certificate': certificate})
+
+
+
+class StudentCertificatesView(LoginRequiredMixin, generic.ListView):
+    template_name = 'profile/certificate.html'
+    model = Certificate
+    slug_field = 'public_id'
+    slug_url_kwarg = 'public_id'
+    def get_queryset(self):
+        return super().get_queryset().filter(student__user=self.request.user)

@@ -7,6 +7,7 @@ from django.utils.encoding import force_bytes, force_str, DjangoUnicodeDecodeErr
 from django.views.generic import View
 from accounts.models import CustomUser
 from accounts.tasks import send_activation_email
+from instructors.models import Instructor
 from .utils import TokenGenerator, generate_token
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -20,8 +21,13 @@ def login_view(request):
     user = authenticate(username=email, password=password)
     if user is not None:
         login(request, user)
-        messages.success(request, 'An activation link has been sent to your email. Please check your inbox to activate your account.')
-        return redirect('home')
+   # Check if the user is an instructor
+        if Instructor.objects.filter(user=user).exists():
+                messages.success(request, 'Welcome, Instructor!')
+                return redirect('instructor_dashboard', request.user.public_id)  # Change to the correct instructor page URL name
+        else:
+            messages.success(request, 'Welcome!')
+            return redirect('home')  # Redirect normal user to home page
     else:
         return render(request, 'accounts/login.html', {'error': 'Invalid credentials'})
 

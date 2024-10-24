@@ -4,7 +4,7 @@ from django.contrib import messages
 
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
-from courses.models import Course
+from courses.models import Course, Student
 from instructors.models import Instructor
 
 
@@ -16,7 +16,8 @@ class InstructorRequiredMixin(LoginRequiredMixin):
         return super().dispatch(request, *args, **kwargs)
 
     def is_instructor(self, user):
-        return Instructor.objects.filter(user=user).exists()
+        if self.request.user.is_authenticated:
+            return Instructor.objects.filter(user=user).exists()
     
     def handle_no_permission(self):
         messages.error(self.request, 'You must be an instructor to access this page.')
@@ -32,11 +33,20 @@ class OwnerEditMixin:
 
 class OwnerCourseMixin(InstructorRequiredMixin, LoginRequiredMixin, PermissionRequiredMixin):
     model = Course
-    fields = ['subject', 'title', 'description', 'image', 'status']
     slug_field = 'public_id'
     slug_url_kwarg ='public_id'
     
     def get_success_url(self):
         # Use the slug or public_id for the success URL
-        return reverse_lazy('manage_course_list', kwargs={self.slug_url_kwarg: self.object.public_id})
+        return redirect('instructor_course_list')
 
+
+class OwnerStudentMixin(InstructorRequiredMixin, LoginRequiredMixin, PermissionRequiredMixin):
+    model = Student
+    permission_required = 'student.view.student'
+    slug_field = 'public_id'
+    slug_url_kwarg ='public_id'
+    
+    def get_success_url(self):
+        # Use the slug or public_id for the success URL
+        return reverse_lazy('instructor_course_list', kwargs={self.slug_url_kwarg: self.object.public_id})

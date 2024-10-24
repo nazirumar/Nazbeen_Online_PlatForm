@@ -1,0 +1,71 @@
+{% extends "instructor/base.html" %}
+{% load custom_tags %}
+
+{% block content_dashboard %}
+
+<!-- Two-column grid layout for medium and large screens -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+
+  <!-- Form Column 1 -->
+  <form method="post" enctype="multipart/form-data" class="w-50 p-5 bg-white rounded shadow-lg">
+    <h2 class="text-2xl font-semibold text-center mb-8">Add a Lesson</h2>
+    {% csrf_token %}
+
+    <div class="mb-6">
+      {{ lesson_form.title.label_tag }}
+      {{ lesson_form.title|add_class:"w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+    </div>
+
+    <div class="mb-6">
+      {{ lesson_form.module.label_tag }}
+      {{ lesson_form.module|add_class:"w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+    </div>
+    <div class="mb-6">
+      {{ lesson_form.thumbnail.label_tag }}
+      {{ lesson_form.thumbnail|add_class:"w-full p-2 border rounded-md" }}
+    </div>
+    <div class="mb-6">
+      {{ lesson_form.description.label_tag }}
+      {{ lesson_form.description|add_class:"w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+    </div>
+
+   
+
+
+
+    <!-- Submit button for first form -->
+    <button type="submit" class="w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">
+      Submit
+    </button>
+  </form>
+
+  <!-- Form Column 2 -->
+  <form action="" method="post" class="w-full p-5 bg-white rounded shadow-lg">
+      <h2 class="text-2xl font-semibold text-center mb-8">Add a Videos</h2>
+      {% csrf_token %}
+      {{ lesson_video_formset.management_form }}
+      {% for form in lesson_video_formset %}
+
+      <div class="mb-6">
+        {{ form.lesson.label_tag }}
+        {{ form.lesson|add_class:"w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+      </div>
+      <div class="mb-6">
+        {{ form.title.label_tag }}
+        {{ form.title|add_class:"w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+      </div>
+
+      <div class="mb-6">
+        {{ form.video.label_tag }}
+        {{ form.video|add_class:"w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+      </div>
+      {% endfor %}
+      <button type="submit" class="w-full py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-300">
+        Submit
+      </button>
+    </form>
+
+    <!-- Submit button for second form -->
+</div>
+
+{% endblock %}

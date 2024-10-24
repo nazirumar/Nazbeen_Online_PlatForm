@@ -1,6 +1,10 @@
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
+from io import BytesIO
+from django.template.loader import get_template
+from django.core.files import File
+from xhtml2pdf import pisa
 
 from courses.models import Course, Enrollment, Student
 
@@ -34,12 +38,34 @@ class ProfileUser(models.Model):
 
 
 
-class Certificate(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    date_awarded = models.DateTimeField(auto_now_add=True)
-    certificate_file = models.FileField(upload_to='certificates/')
+def generate_certificate_pdf(certificate):
+    """
+    Generates and saves a PDF certificate for a given Certificate instance.
+    """
+    template_path = 'profile/certificate_template.html'
+    context = {
+        'certificate': certificate,
+        'student': certificate.student,
+        'course': certificate.course,
+    }
 
-    def __str__(self):
-        return f'{self.student.user.username} - {self.course.title} Certificate'
+    # Render the HTML template
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # Create a BytesIO buffer to save the PDF
+    pdf_buffer = BytesIO()
+
+    # Generate the PDF and save it to the buffer
+    pisa_status = pisa.CreatePDF(html, dest=pdf_buffer)
+
+    # If the PDF was generated successfully, save it to the certificate model
+    if not pisa_status.err:
+        pdf_buffer.seek(0)
+        certificate.certificate_file.save(f"certificate_{certificate.student.user.username}.pdf", File(pdf_buffer))
+        pdf_buffer.close()
+
+        return True  # PDF generated and saved successfully
+    else:
+        return False  # Failed to generate PDF
 

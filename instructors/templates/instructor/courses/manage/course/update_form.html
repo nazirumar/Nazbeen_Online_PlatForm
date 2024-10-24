@@ -1,0 +1,73 @@
+{% extends "instructor/base.html" %}
+{% load custom_tags %}
+
+{% block content_dashboard %}
+
+<div class="container mx-auto mt-8">
+  <div class="max-w-xl mx-auto p-6 bg-white rounded shadow-lg">
+    <h2 class="text-2xl font-semibold text-center mb-8">Add a Course</h2>
+    
+    <form method="post"  enctype="multipart/form-data" class="space-y-6">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <!-- Course Title -->
+      <div>
+        {{ form.title.label_tag }}
+        {{ form.title|add_class:"w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        {{ form.title.errors }}
+      </div>
+
+      <!-- Course Subject -->
+      <div>
+        {{ form.subject.label_tag }}
+        {{ form.subject|add_class:"w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        {{ form.subject.errors }}
+      </div>
+
+      <!-- Course Description -->
+      <div>
+        {{ form.description.label_tag }}
+        {{ form.description|add_class:"w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        {{ form.description.errors }}
+      </div>
+
+      <!-- Access Level -->
+      <div>
+        {{ form.access.label_tag }}
+        {{ form.access|add_class:"w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        {{ form.access.errors }}
+      </div>
+
+      <!-- Course Status -->
+      <div>
+        {{ form.status.label_tag }}
+        {{ form.status|add_class:"w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        {{ form.status.errors }}
+      </div>
+
+      <!-- Course Image -->
+      <div>
+        {{ form.image.label_tag }}
+        {{ form.image|add_class:"w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        {{ form.image.errors }}
+      </div>
+
+      <!-- Course Price -->
+      <div>
+        {{ form.price.label_tag }}
+        {{ form.price|add_class:"w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        {{ form.price.errors }}
+      </div>
+
+      <!-- Submit Button -->
+      <div>
+        <button type="submit" class="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-600">
+          Next
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

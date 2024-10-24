@@ -63,6 +63,10 @@ INSTALLED_APPS = [
     "django_htmx",
     "embed_video",
     "redisboard",
+    # 'daphne',
+    'channels',
+
+    # apps
     "accounts",
     "commando",
     "courses",
@@ -95,12 +99,31 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "courses.context_processors.category",
+                "courses.context_processors.instructor_tag",
+
+
             ],
         },
     },
 ]
 
+# Configure ASGI for Channels
 WSGI_APPLICATION = "portfolio.wsgi.application"
+ASGI_APPLICATION = 'portfolio.asgi.application'
+
+# Channel layers configuration (using in-memory for local development)
+# settings.py
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+
+
 
 
 # Database
@@ -130,13 +153,27 @@ if DATABASE_URL is not None:
         )
     }
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
 
+# Ensure Redis is configured in your cache settings
 CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
     }
 }
+
+# settings.py
+SESSION_COOKIE_SECURE = True  # Use HTTPS in production
+CSRF_COOKIE_SECURE = True  # CSRF over HTTPS only
+SESSION_COOKIE_HTTPONLY = True  # Prevent access via JavaScript
+
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB limit, adjust as needed
 
 
 # Password validation

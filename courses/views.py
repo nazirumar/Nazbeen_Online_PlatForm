@@ -7,16 +7,22 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404
 import helpers
 from django.contrib import messages
-from .models import Category, Lesson, LessonVideo, Student, Subject, Course, Module, Enrollment
+from .models import Category, Lesson, LessonVideo, Likes, Notification, PublishStatus, Student, Subject, Course, Module, Enrollment
 from django.contrib.auth.decorators import login_required
 from courses import services 
-
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 def category_view(request, slug):
-   category = get_object_or_404(Category, public_id=slug)
-   subjects = category.subjects.all()
-
-   return render(request, 'category/list.html', {'subjects':subjects})
+    category = get_object_or_404(Category, public_id=slug)
+    subjects = category.subjects.all()
+    context ={
+        'subjects':subjects
+        }
+    for subject in subjects:
+        courses = subject.subject_courses.filter(status=PublishStatus.PUBLISHED)
+        context['courses']=courses
+    return render(request, 'category/list.html', context)
 
 def category_detail_view(request, slug):
    lesson = get_object_or_404(Course, public_id=slug)
@@ -30,14 +36,20 @@ def like_course(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     liked_count = course.liked_by.count()
 
-    if request.user in course.liked_by.all():
-        course.liked_by.remove(request.user)
-        liked_count -= 1
-        return JsonResponse({'status': 'unliked', 'liked_count': liked_count})
-    else:
-        course.liked_by.add(request.user)
+    # Check if the user already liked the course
+    like, created = Likes.objects.get_or_create(user=request.user, course=course)
+
+    if created:
+        # If the like was just created
         liked_count += 1
-        return JsonResponse({'status': 'liked', 'liked_count': liked_count}) 
+        status = 'liked'
+    else:
+        # If the user is already liked the course, we can remove the like
+        like.delete()  # This will remove the existing like
+        liked_count -= 1
+        status = 'unliked'
+
+    return JsonResponse({'status': status, 'liked_count': liked_count})
 
 
 # View to display details of a course videos title in the lesson
@@ -117,36 +129,6 @@ def student_enroll_course(request, course_id):
     return redirect('course_detail', course_id=course.public_id)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # View to display topics under a module
 def module_detail(request, public_id):
     module = get_object_or_404(Module, public_id=public_id)
@@ -162,3 +144,5 @@ def module_courses(request, module_id):
     courses_data = [{'id': course.id, 'title': course.title} for course in courses]
     return JsonResponse({'courses': courses_data})
 # Enroll a student in a course
+
+
