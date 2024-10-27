@@ -41,5 +41,8 @@ urlpatterns = [
     path('certificates/<slug:public_id>/', views.CertificateDetailView.as_view(), name='certificate_view'),
 
 
+    path('notifications/', views.notifications_view, name='notifications'),
+
+
 
 ]

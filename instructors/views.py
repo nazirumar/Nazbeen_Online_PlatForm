@@ -1,13 +1,15 @@
+import json
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import CreateView
 from instructors.mixin import InstructorRequiredMixin, OwnerCourseMixin, OwnerEditMixin, OwnerStudentMixin
 from django.views import generic
-from courses.models import Course, Lesson, LessonVideo, Module, Student
+from courses.models import Course, Lesson, LessonVideo, Module, Notification, Student
 from instructors.mixin import OwnerCourseMixin
 from django.views.generic.edit import FormView
 
-from instructors.models import Certificate
+from instructors.models import Certificate, Instructor
 
 from .forms import CategoryForm, ModuleFormSet,LessonVideoFormSet, SubjectForm, CourseForm, ModuleForm, LessonForm, LessonVideoForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -83,26 +85,31 @@ class SubjectCreateView(FormView):
         return super().form_valid(form)
     
 
-class ManageCourseListView(InstructorRequiredMixin, CreateView):
+class ManageCourseListView(InstructorRequiredMixin, generic.CreateView):
     model = Course
     template_name = 'instructor/courses/manage/course/list.html'
     fields = ['title', 'subject', 'description', 'access', 'status', 'image', 'price']  # Specify fields explicitly
-
+    success_url = reverse_lazy('instructor_course_list')  # Handle redirect after successful form submission
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["courses"] = self.get_queryset().filter(owner=self.request.user).order_by('-created_at')
+        # Filter courses by the owner (instructor) and order by creation date
+        context["courses"] = Course.objects.filter(owner=self.request.user).order_by('-created_at')
         return context
     
-    def post(self, request):
-        if request.method == 'POST':
-            form = CourseForm(request.POST)
-            if form.is_valid():
-                print(form)
-                form.save()
-                return redirect('instructor_course_list')
-        
-        return render(request, self.template_name, {'form': form})
+    def get_queryset(self):
+        return super().get_queryset().filter(owner=self.request.user).order_by('-created_at')
+    
+    def form_valid(self, form):
+        # Save the course object and return the redirect response
+        course = form.save(commit=False)
+        user = self.request.user
+        instructor = Instructor.objects.get(user=user)
+        course.owner = user
+        course.instructor = instructor
+        course.save()
+        return super().form_valid(form)
+    
 
 
 
@@ -359,3 +366,25 @@ class CertificateDetailView(InstructorRequiredMixin, generic.DetailView):
     slug_url_kwarg = 'public_id'
     template_name =  "instructor/certificates/certificate_view.html"
 
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+
+
+@csrf_exempt
+@require_POST
+def notifications_view(request):
+    try:
+        # Parse JSON data from request body
+        data = json.loads(request.body)
+        notification_id = data.get('notification_id')  # Get notification_id from JSON data
+
+        if notification_id:
+            # Fetch the notification and mark it as viewed
+            notification = Notification.objects.get(id=notification_id)
+            notification.is_read = True
+            notification.save()
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid notification ID'}, status=400)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)

@@ -1,6 +1,9 @@
 from django.shortcuts import get_object_or_404
 from courses.models import Category, Course, Notification
 from instructors.models import Instructor
+from django.http import JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
+
 
 # context_processors.py
 def category(request):
@@ -10,26 +13,28 @@ def category(request):
 
 
 def instructor_tag(request):
-     # Check if the user is authenticated
+      # Initialize default values
+    instructor = None
+    notifications = None
     if request.user.is_authenticated:
         try:
-            # Attempt to retrieve the instructor related to the logged-in user
+            # Retrieve the instructor related to the logged-in user
             instructor = Instructor.objects.get(user=request.user)
-             # Fetch all courses related to the instructor
+            
+            # Fetch all courses related to the instructor
             instructor_courses = Course.objects.filter(instructor=instructor)
-            print(instructor_courses)
-            # Filter notifications related to the instructor's courses and not yet read
-            notifications = Notification.objects.filter(course__in=instructor_courses, is_read=False)
-            print(notifications)
-            if request.method == 'POST':
-                # Mark all notifications as read if a POST request is made
-                notifications.update(is_read=True)
+            # Filter notifications related to the instructor's courses and unread ones
+            notifications = Notification.objects.filter(course__in=instructor_courses, is_read=False).order_by('-timestamp')
+
         except Instructor.DoesNotExist:
-            instructor = None
-            notifications = None
+            # Log or handle the case where the instructor is not found
+            pass
+
+        except ObjectDoesNotExist:
+            # Handle the case when no notifications or courses exist
+            pass
     else:
-        # If the user is not authenticated, set instructor to None
-        instructor = None
-        notifications = None
+        # Log or handle the case where the user is not authenticated
+        pass
 
     return {'instructor': instructor, 'notifications': notifications}

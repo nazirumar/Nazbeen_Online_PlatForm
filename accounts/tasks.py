@@ -1,29 +1,53 @@
-# accounts/tasks.py
-
 from celery import shared_task
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.conf import settings
+from django.contrib.auth import get_user_model
+import logging
+from .utils import account_activation_token
 
-from accounts.models import CustomUser
-from .utils import generate_token
+User = get_user_model()
 
-@shared_task(bind=True, max_retries=5, default_retry_delay=60)
-def send_activation_email(self, user_id):
+logger = logging.getLogger(__name__)
+
+def send_activation_email(user):
+    """
+    Sends an activation email to the user.
+    """
+    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+    token = account_activation_token.make_token(user)  # Remove the trailing comma
+    subject = "Activate Your Account"
+    activation_link = f"{settings.SITE_DOMAIN}{reverse('activate', kwargs={'uidb64': uidb64, 'token': token})}"
+    message = render_to_string('accounts/account_activation_email.html', {
+        'user': user,
+        'domain': settings.SITE_DOMAIN,  # Ensure SITE_DOMAIN is set in settings
+        'activation_link': activation_link,
+    })
+
     try:
-        user = CustomUser.objects.get(pk=user_id)
-        subject = "Activate Your Account"
-        message = render_to_string('accounts/activate.html', {
-            'user': user,
-            'domain': '127.0.0.1:8000',  # Update this to your production domain
-            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-            'token': generate_token.make_token(user),
-        })
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
-    except CustomUser.DoesNotExist:
-        # Log or handle user not found
-        pass
-    except Exception as exc:
-        raise self.retry(exc=exc)  # Retry the task if there's an error
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False,
+            html_message=message,  # Use HTML template for email content
+
+        )
+        logger.info(f"Activation email sent to {user.email}")
+    except Exception as e:
+        logger.error(f"Failed to send activation email to {user.email}: {e}")
+
+@shared_task
+def send_activation_email_task(user_id):
+    """
+    Celery task to send an activation email to a user by user_id.
+    """
+    try:
+        user = User.objects.get(id=user_id)
+        send_activation_email(user)
+    except User.DoesNotExist:
+        logger.error(f"User with id {user_id} does not exist")

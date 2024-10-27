@@ -53,6 +53,7 @@ def like_course(request, course_id):
 
 
 # View to display details of a course videos title in the lesson
+login_required
 def course_lesson_view(request, course_id):
     course = services.get_course_detail(course_id=course_id)
     # Get all modules related to the course
@@ -84,7 +85,7 @@ def get_content(request, course_id):
 
 
 
-
+login_required
 def lesson_detail_view(request, course_id=None, lesson_id=None):
     # Retrieve the course, modules, lessons, and videos
     course_modules_lessons_video = services.get_lessons_video_watch(course_public_id=course_id)

@@ -22,3 +22,21 @@ def create_like_notification(sender, instance, created, **kwargs):
             print("Notification created")
         except Instructor.DoesNotExist:
             print("Instructor not found for the course owner")
+
+
+
+@receiver(post_save, sender=Enrollment)
+def create_enrollment_notification(sender, instance, created, **kwargs):
+    if created:
+          # Get the Instructor associated with the course owner
+        instructor = Instructor.objects.get(user=instance.course.owner)
+
+        Notification.objects.create(
+            instructor=instructor,  # Assuming the owner of the course is the instructor
+            student=instance.student.user,
+            action='enrolled',
+            course=instance.course
+        )
+
+
+

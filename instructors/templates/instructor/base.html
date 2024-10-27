@@ -64,29 +64,51 @@
             </button>
           
             <!-- Notifications dropdown -->
-            <div id="notificationDropdown" class="absolute right-0 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg mt-2 z-10 hidden">
-              <div class="p-4">
-                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Notifications</h3>
-                <ul class="mt-2 space-y-2">
-                  {% for notification in notifications %}
-                    <li class="text-sm text-gray-700 dark:text-gray-300">{{ notification.student.username }} {{ notification.get_action_display }} on {{ notification.course }}</li>
-                  {% empty %}
-                    <li class="text-sm text-gray-700 dark:text-gray-300">No new notifications</li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </div>
+            <div id="notificationDropdown" class="absolute right-0 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-lg mt-2 z-10 hidden">
+               <div class="p-4">
+                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                 <ul class="mt-2 space-y-2">
+                   {% for notification in notifications %}
+                     <li class="notification-item text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
+                         data-notification-id="{{ notification.id }}">
+                       <span class="font-medium" role="button" data-drawer-target="drawer-right-example" data-drawer-show="drawer-right-example" data-drawer-placement="right" aria-controls="drawer-right-example">{{ notification.student.username }}
+                       {{ notification.get_action_display }} on 
+                     {{ notification.course|truncatechars:10 }}</span>
+                     </li>
+                     
+                     <!-- Drawer component -->
+                     <div id="drawer-right-example" class="fixed top-0 right-0 z-50 h-screen p-4 overflow-y-auto transition-transform translate-x-full bg-white w-80 dark:bg-gray-800" tabindex="-1" aria-labelledby="drawer-right-label">
+                       <h5 id="drawer-right-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+                         <svg class="w-4 h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                           <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                         </svg> Notification Details
+                       </h5>
+                       <button type="button" data-drawer-hide="drawer-right-example" aria-controls="drawer-right-example"
+                           class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white"
+                           onclick="location.reload();">
+                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                     </svg>
+                     <span class="sr-only">Close menu</span>
+                     </button>
+
+                       <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">You have a new notification regarding {{ notification.course.title }}.</p>
+                     </div>
+                   {% empty %}
+                     <li class="text-sm text-gray-700 dark:text-gray-300">No new notifications</li>
+                   {% endfor %}
+                 </ul>
+               </div>
+             </div>
+             
           </div>
-          
-        
-          
-          
-            
+           
                 
       </div>
       
    </div>
 </div>
+
 
 
 <!-- Sidebar -->
@@ -208,6 +230,34 @@
 
   <!-- Add this JavaScript for the click toggle functionality -->
   <script>
+
+document.querySelectorAll('.notification-item').forEach(item => {
+    item.addEventListener('click', function() {
+        let notificationId = this.dataset.notificationId;  // Make sure 'notificationId' is correctly set
+
+        console.log('Sending notification ID:', notificationId);  // Debugging log
+
+        fetch("{% url 'notifications' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',  // Include CSRF token if using Django
+            },
+            body: JSON.stringify({ notification_id: notificationId })  // Send notification_id in request body
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                console.log('Notification marked as viewed');
+            } else {
+                console.error(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+
+
    const notificationButton = document.getElementById('notificationButton');
    const notificationDropdown = document.getElementById('notificationDropdown');
  

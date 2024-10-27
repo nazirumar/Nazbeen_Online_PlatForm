@@ -1,74 +1,75 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login
-from accounts.forms import RegisterForm
-from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_decode,urlsafe_base64_encode
-from django.utils.encoding import force_bytes, force_str, DjangoUnicodeDecodeError
-from django.views.generic import View
-from accounts.models import CustomUser
-from accounts.tasks import send_activation_email
-from instructors.models import Instructor
-from .utils import TokenGenerator, generate_token
+from django.contrib.auth import get_user_model
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from django.views import View
 from django.contrib import messages
-from django.core.mail import send_mail
-from django.conf import settings
+from accounts.forms import RegisterForm
+from accounts.tasks import send_activation_email, send_activation_email_task
+from instructors.models import Instructor
+from .utils import account_activation_token
 
+User = get_user_model()
 
 
 def login_view(request):
-    email = request.POST.get('email')
-    password = request.POST.get('password')
-    user = authenticate(username=email, password=password)
-    if user is not None:
-        login(request, user)
-   # Check if the user is an instructor
-        if Instructor.objects.filter(user=user).exists():
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = authenticate(username=email, password=password)
+
+        if user is not None:
+            login(request, user)
+            if Instructor.objects.filter(user=user).exists():
                 messages.success(request, 'Welcome, Instructor!')
-                return redirect('instructor_dashboard', request.user.public_id)  # Change to the correct instructor page URL name
-        else:
+                return redirect('instructor_dashboard', request.user.public_id)
             messages.success(request, 'Welcome!')
-            return redirect('home')  # Redirect normal user to home page
-    else:
-        return render(request, 'accounts/login.html', {'error': 'Invalid credentials'})
+            return redirect('home')
+        else:
+            messages.error(request, 'Invalid credentials')
+    
+    return render(request, 'accounts/login.html')
 
 
 def register_view(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False  # Deactivate account until it's activated
+            user.is_active = False
             user.save()
 
-            # Trigger the Celery task to send the activation email
-            domain = request.get_host()
-            send_activation_email.delay(user.pk)
-
+            # Trigger Celery task to send activation email
+            send_activation_email_task.delay(user.id)
             messages.success(request, "Please check your email to activate your account.")
             return redirect('login')
-        else:
-            messages.error(request, "Registration failed. Please correct the errors below.")
-            return render(request, 'accounts/register.html', {'form': form})
+
+        messages.error(request, "Registration failed. Please correct the errors below.")
+    
     else:
         form = RegisterForm()
+    
     return render(request, 'accounts/register.html', {'form': form})
 
-class ActivateAccountView(View):
-    def get(self, request, uidb64, token):
-        try:
-            # Decode the user ID from the base64 encoded string
-            uid = force_str(urlsafe_base64_decode(uidb64))
-            user = CustomUser.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
-            user = None
 
-        # Check if the user exists and if the token is valid
-        if user is not None and generate_token.check_token(user, token):
-            user.is_active = True
-            user.save()
-            messages.success(request, "Account activated successfully. You can now log in.")
-            return redirect('account:login')
-        else:
-            # Render an account activation failure page
-            messages.error(request, "The activation link is invalid or has expired.")
-            return render(request, 'accounts/activatefail.html')
+
+def activate_account(request, uidb64, token):
+    try:
+        # Decode the uidb64 to get the user's primary key
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    # Check if the token is valid
+    if user is not None and account_activation_token.check_token(user, token):
+        # Activate the user account
+        user.is_active = True
+        user.save()
+        login(request, user)  # Log the user in
+        messages.success(request, 'Your account has been activated successfully!')
+        return redirect('home')  # Redirect to the home page or any other page
+    else:
+        messages.error(request, 'Activation link is invalid!')
+        return redirect('home')  # Redirect to the home page or a different page
