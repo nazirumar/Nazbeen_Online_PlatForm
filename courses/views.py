@@ -1,7 +1,7 @@
 from django.forms import modelformset_factory
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
-
+from django.conf import settings
 from courses.models import Category, Course,  Module
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404
@@ -54,7 +54,7 @@ def like_course(request, course_id):
 
 # View to display details of a course videos title in the lesson
 login_required
-def course_lesson_view(request, course_id):
+def course_detail_view(request, course_id):
     course = services.get_course_detail(course_id=course_id)
     # Get all modules related to the course
     modules = course.modules.all()
@@ -70,7 +70,9 @@ def course_lesson_view(request, course_id):
         'course': course,
         'course_videos': course_videos,
         'lesson_public_id': last_lesson_public_id,
-        'is_enrolled':is_enrolled
+        'is_enrolled':is_enrolled,
+        'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
+
     }
     return render(request, 'courses/course_detail.html', context)
 

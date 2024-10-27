@@ -230,6 +230,7 @@ class Enrollment(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="enrollments")
     enrollment_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=EnrollmentStatus.choices, default=EnrollmentStatus.PENDING)
+    enrolled_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ("student", "course")

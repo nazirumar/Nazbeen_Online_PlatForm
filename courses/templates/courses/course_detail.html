@@ -70,7 +70,9 @@ Home Page
 
             <form method="post" action="{% url 'student_enroll_course' course.public_id %}">
               {% csrf_token %}
-              <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+              <input type="hidden" name="course_id" value="{{ course.public_id }}">
+
+              <button type="button" id="checkout-button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                   {% if user.is_authenticated %}
                       Enroll in this course
                   {% else %}
@@ -126,7 +128,7 @@ Home Page
       {% for video in course_videos %}
       <div class="flex  items-center gap-3">
         <div>
-          <svg class="w-[29px] h-[29px] text-dark dark:text-dark w-5 h-5 p-1  rounded-full border border-gray-900"
+          <svg class="text-dark dark:text-dark w-5 h-5 p-1  rounded-full border border-gray-900"
             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
             viewBox="0 0 24 24">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4"
@@ -144,5 +146,25 @@ Home Page
 
   </div>
 </div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+document.getElementById("checkout-button").addEventListener("click", function () {
+    fetch("{% url 'enroll_course' course.id %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      
+        const stripe = Stripe("{{ stripe_publishable_key }}");
+        stripe.redirectToCheckout({ sessionId: data.sessionId });
+    })
+    .catch(error => console.error("Error:", error));
+});
+</script>
 
 {% endblock content %}

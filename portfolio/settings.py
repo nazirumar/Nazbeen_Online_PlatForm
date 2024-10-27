@@ -81,12 +81,14 @@ INSTALLED_APPS = [
     "courses",
     "profiles",
     "instructors",
+    'payment',
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'django.middleware.gzip.GZipMiddleware',  # Add GZip Middleware for compression
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -215,6 +217,14 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 SITE_DOMAIN = 'http://localhost:8001'
+
+
+
+
+
+
+STRIPE_SECRET_KEY=config("STRIPE_SECRET_KEY")
+STRIPE_PUBLISHABLE_KEY=config("STRIPE_PUBLISHABLE_KEY")
 
 MESSAGE_TAGS = {
     messages.DEBUG: "alert-secondary",
