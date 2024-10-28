@@ -124,7 +124,7 @@ ASGI_APPLICATION = 'portfolio.asgi.application'
 
 # Channel layers configuration (using in-memory for local development)
 
-redis_url = config("REDIS_URL", default="redis://localhost:6379")
+redis_url = config("REDIS_URL", default="redis://localhost:6379/0")
 # settings.py
 CHANNEL_LAYERS = {
     'default': {
@@ -169,7 +169,7 @@ SESSION_CACHE_ALIAS = 'default'
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'LOCATION': redis_url,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -210,8 +210,8 @@ LOGIN_URL = "login"
 LOGOUT_REDIRECT_URL = LOGIN_URL
 
 # Celery Configuration
-CELERY_BROKER_URL = "redis://localhost:6379/0"  # Assuming Redis is running on localhost
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = redis_url  # Assuming Redis is running on localhost
+CELERY_RESULT_BACKEND = redis_url
 
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 SITE_DOMAIN = 'http://localhost:8001'
