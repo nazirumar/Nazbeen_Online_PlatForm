@@ -56,7 +56,7 @@ if all([ADMIN_USER_NAME, ADMIN_USER_EMAIL]):
     MANAGERS=ADMINS
 
 
-ALLOWED_HOSTS = [".saas-foundation-by-nazbeen.onrender.com"]
+ALLOWED_HOSTS = [".nazbeen-online-platform.onrender.com"]
 if DEBUG:
     ALLOWED_HOSTS.append("localhost")
     ALLOWED_HOSTS.append("127.0.0.1")
@@ -142,12 +142,8 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("SQL_DATABASE", default=str(BASE_DIR / "db.sqlite3")),
-        "USER": config("SQL_USER", default="user"),
-        "PASSWORD": config("SQL_PASSWORD", default="password"),
-        "HOST": config("SQL_HOST", default="localhost"),
-        "PORT": config("SQL_PORT", default="5432"),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
