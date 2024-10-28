@@ -226,6 +226,7 @@ class EnrollmentStatus(models.TextChoices):
     CANCELLED = ("cancelled", "Cancelled")
 
 class Enrollment(models.Model):
+    public_id = models.CharField(max_length=130, blank=True, null=True, db_index=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="enrollments")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="enrollments")
     enrollment_date = models.DateTimeField(auto_now_add=True)
@@ -237,7 +238,10 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f"{self.student.user.username} enrolled in {self.course.title}"
-
+    def save(self, *args, **kwargs):
+        if not self.public_id:
+            self.public_id = generate_public_id(self, self.student.user.username)
+        super().save(*args, **kwargs)
 class Quiz(models.Model):
     title = models.CharField(max_length=250)
     module = models.ForeignKey(Module, related_name="quizzes", on_delete=models.CASCADE, blank=True, null=True)
@@ -279,6 +283,8 @@ class Answer(models.Model):
 
 
 class Notification(models.Model):
+    public_id = models.CharField(max_length=130, blank=True, null=True, db_index=True)
+
     INSTRUCTOR_ACTIONS = [
         ('enrolled', 'Student Enrolled'),
         ('feedback', 'Feedback Received'),
@@ -293,3 +299,8 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.student} {self.get_action_display()} on {self.course}"
+    
+    def save(self, *args, **kwargs):
+        if not self.public_id:
+            self.public_id = generate_public_id(self, self.student.username)
+        super().save(*args, **kwargs)

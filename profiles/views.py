@@ -4,6 +4,7 @@ from django.views import generic
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+from courses.models import Course, Enrollment, Notification, Student
 from instructors.models import Certificate
 from io import BytesIO
 from django.core.files import File
@@ -50,3 +51,40 @@ class StudentCertificatesView(LoginRequiredMixin, generic.ListView):
     slug_url_kwarg = 'public_id'
     def get_queryset(self):
         return super().get_queryset().filter(student__user=self.request.user)
+    
+
+
+class StudentNotificationView(LoginRequiredMixin, generic.DetailView):
+    template_name = 'students/notification.html'
+    model = Notification
+    slug_field = 'public_id'
+    slug_url_kwarg = 'public_id'
+    def get_queryset(self):
+        return super().get_queryset().filter(student=self.request.user)
+    
+    def get(self, request, *args, **kwargs):
+        """
+        Override the get method to mark the notification as read
+        when it's accessed by the student.
+        """
+        # Mark the notification as read
+        notification = self.get_object()  # Get the specific notification object
+        if not notification.is_read:
+            notification.is_read = True
+            notification.save()
+        return super().get(request, *args, **kwargs)
+
+    
+
+class StudentCoursesView(LoginRequiredMixin, generic.ListView):
+    template_name = 'students/student_courses.html'
+    model = Course
+    context_object_name = 'enrolled_courses'
+
+
+    
+    def get_queryset(self):
+        # Get the list of courses that the student is enrolled in
+        student = Student.objects.get(user=self.request.user)
+        enrolled_courses = Course.objects.filter(enrollments__student=student)
+        return enrolled_courses

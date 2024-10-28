@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from courses.models import Category, Course, Notification
+from courses.models import Category, Course, Notification, Student
 from instructors.models import Instructor
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -8,7 +8,19 @@ from django.core.exceptions import ObjectDoesNotExist
 # context_processors.py
 def category(request):
     categories = Category.objects.all()
-    return {'categories': categories}
+    student_notifications = None
+
+    if request.user.is_authenticated:
+        try:
+               # Retrieve the instructor related to the logged-in user
+            student = Student.objects.get(user=request.user)
+            # Fetch all courses related to the instructor
+            student_courses = Course.objects.filter(student=student)
+            # Filter notifications related to the instructor's courses and unread ones
+            student_notifications = Notification.objects.filter(course__in=student_courses, is_read=False).order_by('-timestamp')
+        except ObjectDoesNotExist:
+            pass
+    return {'categories': categories, 'student_notifications':student_notifications}
 
 
 

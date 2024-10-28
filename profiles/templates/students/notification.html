@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Home Page
+{% endblock title %}
+
+{% block content %}
+
+
+<div class="max-w-4xl mx-auto p-6">
+    <div class="bg-white shadow-md rounded-lg p-4">
+        <h2 class="text-lg font-semibold text-gray-800">Notification Details</h2>
+        <p class="mt-2 text-gray-700">
+            <strong>Action:</strong> {{ object.get_action_display }}
+        </p>
+        <p class="mt-2 text-gray-700">
+            <strong>Course:</strong> {{ object.course.title }}
+        </p>
+        <p class="mt-4 text-gray-500">Received on: {{ object.timestamp|date:"F j, Y, g:i a" }}</p>
+        <p class="mt-4 text-gray-500">Status: {{  object.is_read  }}</p>
+    </div>
+</div>
+
+{% endblock %}
