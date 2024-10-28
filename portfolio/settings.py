@@ -123,12 +123,14 @@ WSGI_APPLICATION = "portfolio.wsgi.application"
 ASGI_APPLICATION = 'portfolio.asgi.application'
 
 # Channel layers configuration (using in-memory for local development)
+
+redis_url = config("REDIS_URL", default="redis://localhost:6379")
 # settings.py
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [redis_url],
         },
     },
 }
