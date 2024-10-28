@@ -34,7 +34,6 @@ django-braces==1.15.0
 django-ckeditor==6.7.1
 django-ckeditor-5==0.2.13
 django-compressor==4.5.1
-django-db-pool==0.0.10
 django-embed-video==1.4.10
 django-formtools==2.5.1
 django-htmx==1.19.0
