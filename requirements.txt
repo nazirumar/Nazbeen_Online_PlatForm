@@ -25,7 +25,7 @@ cssselect2==0.7.0
 daphne==4.1.2
 decorator==4.4.2
 dj-database-url==2.2.0
-Django==5.1.2
+Django==5.1.4
 django-allauth==64.2.1
 django-allauth-ui==1.4.1
 django-amazon-ses==4.0.1
